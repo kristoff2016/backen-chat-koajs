@@ -12,8 +12,7 @@ const attributes = {
     unique: true
   },
   firstName: {
-    type: STRING,
-    allowedNull: false
+    type: STRING
   },
   lastName: {
     type: STRING
@@ -28,7 +27,11 @@ const modelOptions = {
   sequelize: global.db
 }
 
-class User extends Model {}
+class User extends Model {
+  get id () {
+    return this.getDataValue('id')
+  }
+}
 
 User.init(attributes, modelOptions)
 

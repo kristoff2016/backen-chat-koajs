@@ -1,5 +1,4 @@
 /// <reference path="./typings/modules/sequelize/index.d.ts" />
-/** global db */
 const env = require('dotenv')
 env.config()
 
@@ -10,7 +9,8 @@ const config = require('./config')
 const { app: { port } } = config
 ;(async () => {
   try {
-    await global.db.sync({ force: false, logging: console.log })
+    // await global.db.sync({ force: false, logging: false })
+    await global.db.authenticate()
     server.listen(port, () => console.log(`Server running on port ${port}`))
   } catch (e) {
     console.error(e)

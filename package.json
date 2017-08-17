@@ -39,6 +39,7 @@
     "koa-static": "^4.0.1",
     "koa-views": "^6.0.2",
     "mime-types": "^2.1.16",
+    "moment": "^2.18.1",
     "mysql2": "^1.4.1",
     "nodemailer": "^4.0.1",
     "pug": "^2.0.0-rc.3",
