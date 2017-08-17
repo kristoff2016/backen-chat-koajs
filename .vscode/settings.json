@@ -1,0 +1,10 @@
+{
+    "standard.enable": true,
+    "prettier.printWidth": 120,
+    "prettier.tabWidth": 2,
+    "prettier.useTabs": false,
+    "prettier.arrowParens": false,
+    "prettier.spaceBeforeFunctionParen": true,
+    "prettier.semi": false,
+    "editor.tabSize": 2
+}
