@@ -29,7 +29,19 @@ const modelOptions = {
 
 class User extends Model {
   get id () {
-    return this.getDataValue('id')
+    return +this.getDataValue('id')
+  }
+  get email () {
+    return `${this.getDataValue('email')}`
+  }
+  get firstName () {
+    return `${this.getDataValue('firstName')}`
+  }
+  get lastName () {
+    return `${this.getDataValue('lastName')}`
+  }
+  get imageUrl () {
+    return `${this.getDataValue('imageUrl')}`
   }
 }
 
