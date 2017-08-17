@@ -1,4 +1,10 @@
+const { NODE_ENV = 'development', PORT = 5000, DB_URI = '' } = process.env
+
 exports.app = {
-  env: process.env.NODE_ENV || 'development',
-  port: process.env.PORT || 5000
+  env: NODE_ENV,
+  port: PORT
+}
+
+exports.db = {
+  uri: DB_URI
 }

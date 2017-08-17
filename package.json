@@ -29,6 +29,7 @@
   ],
   "license": "ISC",
   "dependencies": {
+    "dotenv": "^4.0.0",
     "indicative": "^2.2.1",
     "koa": "^2.3.0",
     "koa-bodyparser": "^4.2.0",
@@ -48,6 +49,7 @@
   },
   "devDependencies": {
     "nodemon": "^1.11.0",
-    "standard": "^10.0.3"
+    "standard": "^10.0.3",
+    "typings": "^2.1.1"
   }
 }
