@@ -7,7 +7,7 @@ const { transport } = require('../../helpers/email')
 exports.getLoginCode = async ctx => {
   const { email } = ctx.request.body
   const t = await global.db.transaction()
-  const code = Math.floor(10000000 + Math.random() * 90000000)
+  const code = Math.floor(100000 + Math.random() * 900000)
   try {
     const [ user ] = await User.findOrCreate({
       where: { email },
