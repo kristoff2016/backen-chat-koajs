@@ -13,12 +13,12 @@ exports.validateEmail = async (ctx, next) => {
 
 exports.validateLogin = async (ctx, next) => {
   const { email, code } = ctx.request.body
-  if (!code) throw new BadRequestError('Login code is required!')
+  if (!code) throw new BadRequestError('Code is required!')
   const user = await User.find({ where: { email } })
   const loginCode = await UserLoginCode.find({ where: { code, userId: user.id } })
-  if (!loginCode) throw new BadRequestError('Incorrect login code')
+  if (!loginCode) throw new BadRequestError('Invalid code')
   const now = moment().toISOString()
   const expire = loginCode.expiredAt
-  if (moment(now).isAfter(expire)) throw new BadRequestError('Login code expired')
+  if (moment(now).isAfter(expire)) throw new BadRequestError('Code is expired!')
   await next()
 }

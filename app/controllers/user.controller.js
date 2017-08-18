@@ -16,7 +16,7 @@ exports.getLoginCode = async ctx => {
       defaults: { email },
       transaction: t
     })
-    const loginCode = await UserLoginCode.create(
+    await UserLoginCode.create(
       {
         code,
         expiredAt: moment().add('5', 'minutes').toISOString(),
@@ -38,7 +38,10 @@ exports.getLoginCode = async ctx => {
       html
     }
     await transport.sendMail(message)
-    ctx.body = { ...user.get(), loginCode: loginCode.toJSON() }
+    ctx.body = {
+      message: 'Please check your email. We sent you code!',
+      status: 200
+    }
   } catch (error) {
     await t.rollback()
     throw error
@@ -48,5 +51,5 @@ exports.getLoginCode = async ctx => {
 exports.login = async ctx => {
   const { email, code } = ctx.request.body
   const token = await jwt.sign({ email, code }, config.jwt.secret, { expiresIn: '1 day' })
-  ctx.body = { token }
+  ctx.body = { token, message: 'success', status: 200 }
 }
