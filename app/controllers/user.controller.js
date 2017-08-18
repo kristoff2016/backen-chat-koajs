@@ -3,6 +3,8 @@ const pug = require('pug')
 const { User } = require('../models/user.model')
 const { UserLoginCode } = require('../models/user-loging-code.model')
 const { transport } = require('../../helpers/email')
+const jwt = require('../../helpers/jwt')
+const config = require('../../config')
 
 exports.getLoginCode = async ctx => {
   const { email } = ctx.request.body
@@ -43,4 +45,8 @@ exports.getLoginCode = async ctx => {
   }
 }
 
-exports.login = async ctx => {}
+exports.login = async ctx => {
+  const { email, code } = ctx.request.body
+  const token = await jwt.sign({ email, code }, config.jwt.secret, { expiresIn: '1 day' })
+  ctx.body = { token }
+}
