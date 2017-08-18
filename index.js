@@ -1,4 +1,3 @@
-/// <reference path="./typings/modules/sequelize/index.d.ts" />
 const env = require('dotenv')
 env.config()
 
