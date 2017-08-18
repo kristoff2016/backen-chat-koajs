@@ -2,7 +2,7 @@ const moment = require('moment')
 const pug = require('pug')
 const { User } = require('../models/user.model')
 const { UserLoginCode } = require('../models/user-loging-code.model')
-//const { transport } = require('../../helpers/email')
+const { transport } = require('../../helpers/email')
 
 exports.getLoginCode = async ctx => {
   const { email } = ctx.request.body
@@ -24,18 +24,18 @@ exports.getLoginCode = async ctx => {
     )
     await t.commit()
     // send code verify account
-    // const compileFunc = pug.compileFile('app/views/template/email.pug')
-    // const html = compileFunc({
-    //   code
-    // })
-    // let message = {
-    //   from: 'API League <brainmusic2017@gmail.com>',
-    //   to: email,
-    //   subject: 'Messenger',
-    //   generateTextFromHTML: true,
-    //   html
-    // }
-    // await transport.sendMail(message)
+    const compileFunc = pug.compileFile('app/views/template/email.pug')
+    const html = compileFunc({
+      code
+    })
+    let message = {
+      from: 'API League <brainmusic2017@gmail.com>',
+      to: email,
+      subject: 'Pathmazing Messenger',
+      generateTextFromHTML: true,
+      html
+    }
+    await transport.sendMail(message)
     ctx.body = { ...user.get(), loginCode: loginCode.toJSON() }
   } catch (error) {
     await t.rollback()
