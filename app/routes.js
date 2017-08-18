@@ -4,7 +4,7 @@ module.exports = [
   {
     prefix: '/v1/login',
     routes: [
-      { method: 'POST', path: '/', middleware: { }, handler: UserController.login },
+      { method: 'POST', path: '/', middleware: [], handler: UserController.login },
       { method: 'POST', path: '/code', handler: UserController.getLoginCode }
     ]
   },
