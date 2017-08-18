@@ -40,6 +40,7 @@
     "koa-router": "^7.2.1",
     "koa-static": "^4.0.1",
     "koa-views": "^6.0.2",
+    "lodash": "^4.17.4",
     "mime-types": "^2.1.16",
     "moment": "^2.18.1",
     "mysql2": "^1.4.1",
@@ -47,6 +48,7 @@
     "pug": "^2.0.0-rc.3",
     "sequelize": "^4.5.0",
     "socket.io": "^2.0.3",
+    "socket.io-controllers": "^1.1.0",
     "string-template": "^1.0.0",
     "uuid": "^3.1.0"
   },
