@@ -1,3 +1,3 @@
 exports.welcome = async ctx => {
-  ctx.render('index')
+  await ctx.render('index')
 }
