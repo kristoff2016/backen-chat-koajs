@@ -33,14 +33,6 @@ ChatMessage.init(attributes, modelOptions)
 exports.ChatMessage = ChatMessage
 
 const { User } = require('./user.model')
-const { chatRoom } = require('./chat-room.model')
-
-ChatMessage.belongsTo(chatRoom, {
-  as: 'chat_room',
-  foreignKey: { name: 'chatId', allowNull: false },
-  onUpdate: 'CASCADE',
-  onDelete: 'CASCADE'
-})
 
 ChatMessage.belongsTo(User, {
   as: 'user',
