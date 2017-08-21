@@ -36,6 +36,7 @@ exports.isAuthenticated = async (ctx, next) => {
     where: { email: jwtResult.email }
   })
 
-  ctx.currentUser = user.toJSON()
+  ctx.state.currentUser = user
+
   await next()
 }

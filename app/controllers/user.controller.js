@@ -50,56 +50,39 @@ exports.getLoginCode = async ctx => {
 }
 
 exports.login = async ctx => {
-  const { email, code } = ctx.request.body
-  const token = await jwt.sign({ email, code }, config.jwt.secret, { expiresIn: '1 day' })
+  const { user, loginCode } = ctx.state
+  const userJSON = user.toJSON()
+  delete userJSON.password
+  const token = await jwt.sign(userJSON, config.jwt.secret, { expiresIn: '1 day' })
+
   ctx.body = {
-    token: 'JWT ' + token,
-    message: 'success',
-    status: 200
+    token: 'JWT ' + token
   }
+
+  loginCode.expiredAt = moment().toISOString()
+  await loginCode.save()
 }
 
 exports.getUserProfile = async ctx => {
-  const { id: userId } = ctx.currentUser
-
-  const user = await User.findOne({
-    where: {
-      id: userId
-    }
-  })
-
-  if (!user) throw new BadRequestError('No User found')
-
-  ctx.status = 200
-  ctx.body = user
+  ctx.body = ctx.state.currentUser.toJSON()
 }
 
 exports.updateUserProfile = async ctx => {
-  const { id: userId } = ctx.currentUser
+  const { currentUser } = ctx.state
   const { firstName, lastName } = ctx.request.body
-  const t = await global.db.transaction()
 
-  try {
-    const user = await User.findOne({
-      where: {
-        id: userId
-      }
-    })
-    user.firstName = firstName
-    user.lastName = lastName
-    await user.save({ transaction: t })
-    const newUser = await User.findOne({
-      where: {
-        id: userId
-      },
-      transaction: t
-    })
-
-    await t.commit()
-    ctx.status = 200
-    ctx.body = newUser
-  } catch (error) {
-    t.rollback()
-    throw error
+  if (!firstName && !lastName) {
+    throw new BadRequestError('First name and last name are required.')
   }
+
+  ctx.body = await global.db.transaction(async t => {
+    const queryOptions = { transaction: t }
+    currentUser.firstName = `${firstName}`.trim()
+    currentUser.lastName = `${lastName}`.trim()
+
+    await currentUser.save(queryOptions)
+    await currentUser.reload(queryOptions)
+
+    return currentUser.toJSON()
+  })
 }
