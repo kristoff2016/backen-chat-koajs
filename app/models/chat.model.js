@@ -24,8 +24,8 @@ Chat.init(attributes, modelOptions)
 exports.Chat = Chat
 
 const { ChatMessage } = require('./chat-message.model')
-const { UserChat } = require('./user-chat.model')
 const { User } = require('./user.model')
+const { UserChat } = require('./user-chat.model')
 
 Chat.hasMany(ChatMessage, {
   as: 'messages',

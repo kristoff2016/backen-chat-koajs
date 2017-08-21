@@ -19,12 +19,12 @@ const modelOptions = {
 
 class UserChat extends Model {}
 
-const { User } = require('./user.model')
-const { Chat } = require('./chat.model')
-
 UserChat.init(attributes, modelOptions)
 
 exports.UserChat = UserChat
+
+const { User } = require('./user.model')
+const { Chat } = require('./chat.model')
 
 UserChat.belongsTo(User, {
   foreignKey: 'userId',
