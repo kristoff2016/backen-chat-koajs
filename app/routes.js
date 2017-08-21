@@ -10,6 +10,21 @@ module.exports = [
     prefix: '/',
     routes: [ { method: 'GET', path: '/', middleware: [], handler: WelcomeController.welcome } ]
   },
+  // {
+  //   prefix: '/v1/chats',
+  //   routes: [ {  } ]
+  // },
+
+  // list users[] (limit/ offset)
+  // create chat (w/ invited users[])
+  // invite users <--
+  // kick users -->
+
+  // real-time ops
+  // send/create chat message (API/ realtime)
+  // edit
+  // delete
+
   {
     prefix: '/v1/upload',
     routes: [
