@@ -12,20 +12,20 @@ const attributes = {
   }
 }
 const modelOptions = {
-  name: { singular: 'chat', plural: 'chats' },
-  tableName: 'chat',
+  name: { singular: 'chatRoom', plural: 'chatRooms' },
+  tableName: 'chat_room',
   sequelize: global.db
 }
 
-class Chat extends Model {}
+class chatRoom extends Model {}
 
-Chat.init(attributes, modelOptions)
+chatRoom.init(attributes, modelOptions)
 
-exports.Chat = Chat
+exports.chatRoom = chatRoom
 
 const { ChatMessage } = require('./chat-message.model')
 
-Chat.hasMany(ChatMessage, {
+chatRoom.hasMany(ChatMessage, {
   as: 'messages',
   foreignKey: { name: 'chatId', allowNull: false },
   onUpdate: 'CASCADE',

@@ -6,3 +6,7 @@ exports.app = {
 exports.db = {
   uri: process.env.DB_URI || ''
 }
+
+exports.jwt = {
+  secret: process.env.SECRET || 'not-a-secret-key'
+}

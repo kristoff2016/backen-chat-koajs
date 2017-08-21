@@ -4,18 +4,20 @@ const { User } = require('../models/user.model')
 const { UserLoginCode } = require('../models/user-loging-code.model')
 const { transport } = require('../../helpers/email')
 const { BadRequestError } = require('../../helpers/httpError')
+const jwt = require('../../helpers/jwt')
+const config = require('../../config')
 
 exports.getLoginCode = async ctx => {
   const { email } = ctx.request.body
   const t = await global.db.transaction()
-  const code = Math.floor(10000000 + Math.random() * 90000000)
+  const code = Math.floor(100000 + Math.random() * 900000)
   try {
     const [ user ] = await User.findOrCreate({
       where: { email },
       defaults: { email },
       transaction: t
     })
-    const loginCode = await UserLoginCode.create(
+    await UserLoginCode.create(
       {
         code,
         expiredAt: moment().add('5', 'minutes').toISOString(),
@@ -37,14 +39,21 @@ exports.getLoginCode = async ctx => {
       html
     }
     await transport.sendMail(message)
-    ctx.body = { ...user.get(), loginCode: loginCode.toJSON() }
+    ctx.body = {
+      message: 'Please check your email. We sent you code!',
+      status: 200
+    }
   } catch (error) {
     await t.rollback()
     throw error
   }
 }
 
-exports.login = async ctx => {}
+exports.login = async ctx => {
+  const { email, code } = ctx.request.body
+  const token = await jwt.sign({ email, code }, config.jwt.secret, { expiresIn: '1 day' })
+  ctx.body = { token, message: 'success', status: 200 }
+}
 
 exports.getUserProfile = async ctx => {
   const { userId } = ctx.request.body
