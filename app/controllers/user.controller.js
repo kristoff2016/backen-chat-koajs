@@ -3,6 +3,7 @@ const pug = require('pug')
 const { User } = require('../models/user.model')
 const { UserLoginCode } = require('../models/user-loging-code.model')
 const { transport } = require('../../helpers/email')
+const { BadRequestError } = require('../../helpers/httpError')
 
 exports.getLoginCode = async ctx => {
   const { email } = ctx.request.body
@@ -44,3 +45,46 @@ exports.getLoginCode = async ctx => {
 }
 
 exports.login = async ctx => {}
+
+exports.getUserProfile = async ctx => {
+  const { userId } = ctx.request.body
+
+  const user = await User.findById({
+    where: {
+      id: userId
+    }
+  })
+
+  if (!user) throw new BadRequestError('No User found')
+
+  ctx.status = 200
+  ctx.body = user
+}
+
+exports.updateUserProfile = async ctx => {
+  const { userId, firstName, lastName } = ctx.request.body
+  const t = await global.db.transaction()
+
+  try {
+    const user = await User.findOne({
+      where: {
+        id: userId
+      }
+    })
+    user.firstName = firstName
+    user.lastName = lastName
+    await user.save({ transaction: t })
+    const newUser = await User.findOne({
+      where: {
+        id: userId
+      }
+    })
+
+    await t.commit()
+    ctx.status = 200
+    ctx.body = newUser
+  } catch (error) {
+    t.rollback()
+    throw error
+  }
+}

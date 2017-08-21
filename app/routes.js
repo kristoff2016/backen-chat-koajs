@@ -11,8 +11,8 @@ module.exports = [
   {
     prefix: '/v1/profiles',
     routes: [
-      { method: 'GET', path: '/', middleware: [], handler: () => {} },
-      { method: 'PUT', path: '/', middleware: [], handler: () => {} }
+       { method: 'GET', path: '/', middleware: [], handler: UserController.getUserProfile },
+      { method: 'PUT', path: '/', middleware: [], handler: UserController.updateUserProfile }
     ]
   }
 ]
