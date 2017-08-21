@@ -52,13 +52,17 @@ exports.getLoginCode = async ctx => {
 exports.login = async ctx => {
   const { email, code } = ctx.request.body
   const token = await jwt.sign({ email, code }, config.jwt.secret, { expiresIn: '1 day' })
-  ctx.body = { token, message: 'success', status: 200 }
+  ctx.body = {
+    token: 'JWT ' + token,
+    message: 'success',
+    status: 200
+  }
 }
 
 exports.getUserProfile = async ctx => {
-  const { userId } = ctx.request.body
+  const { id: userId } = ctx.currentUser
 
-  const user = await User.findById({
+  const user = await User.findOne({
     where: {
       id: userId
     }
@@ -71,7 +75,8 @@ exports.getUserProfile = async ctx => {
 }
 
 exports.updateUserProfile = async ctx => {
-  const { userId, firstName, lastName } = ctx.request.body
+  const { id: userId } = ctx.currentUser
+  const { firstName, lastName } = ctx.request.body
   const t = await global.db.transaction()
 
   try {
@@ -86,7 +91,8 @@ exports.updateUserProfile = async ctx => {
     const newUser = await User.findOne({
       where: {
         id: userId
-      }
+      },
+      transaction: t
     })
 
     await t.commit()
