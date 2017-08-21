@@ -1,6 +1,7 @@
 const WelcomeController = require('./controllers/welcome.controller')
 const UserController = require('./controllers/user.controller')
 const { validateEmail, validateLogin } = require('./middleware/user.middleware')
+const { isAuthenticated } = require('./middleware/auth.middleware')
 module.exports = [
   {
     prefix: '/',
@@ -16,8 +17,8 @@ module.exports = [
   {
     prefix: '/v1/profiles',
     routes: [
-      { method: 'GET', path: '/', middleware: [], handler: () => {} },
-      { method: 'PUT', path: '/', middleware: [], handler: () => {} }
+       { method: 'GET', path: '/', middleware: [ isAuthenticated ], handler: UserController.getUserProfile },
+      { method: 'PUT', path: '/', middleware: [ isAuthenticated ], handler: UserController.updateUserProfile }
     ]
   }
 ]

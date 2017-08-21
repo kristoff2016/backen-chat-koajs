@@ -3,6 +3,7 @@ const pug = require('pug')
 const { User } = require('../models/user.model')
 const { UserLoginCode } = require('../models/user-loging-code.model')
 const { transport } = require('../../helpers/email')
+const { BadRequestError } = require('../../helpers/httpError')
 const jwt = require('../../helpers/jwt')
 const config = require('../../config')
 
@@ -49,7 +50,39 @@ exports.getLoginCode = async ctx => {
 }
 
 exports.login = async ctx => {
-  const { email, code } = ctx.request.body
-  const token = await jwt.sign({ email, code }, config.jwt.secret, { expiresIn: '1 day' })
-  ctx.body = { token, message: 'success', status: 200 }
+  const { user, loginCode } = ctx.state
+  const userJSON = user.toJSON()
+  delete userJSON.password
+  const token = await jwt.sign(userJSON, config.jwt.secret, { expiresIn: '1 day' })
+
+  ctx.body = {
+    token: 'JWT ' + token
+  }
+
+  loginCode.expiredAt = moment().toISOString()
+  await loginCode.save()
+}
+
+exports.getUserProfile = async ctx => {
+  ctx.body = ctx.state.currentUser.toJSON()
+}
+
+exports.updateUserProfile = async ctx => {
+  const { currentUser } = ctx.state
+  const { firstName, lastName } = ctx.request.body
+
+  if (!firstName && !lastName) {
+    throw new BadRequestError('First name and last name are required.')
+  }
+
+  ctx.body = await global.db.transaction(async t => {
+    const queryOptions = { transaction: t }
+    currentUser.firstName = `${firstName}`.trim()
+    currentUser.lastName = `${lastName}`.trim()
+
+    await currentUser.save(queryOptions)
+    await currentUser.reload(queryOptions)
+
+    return currentUser.toJSON()
+  })
 }

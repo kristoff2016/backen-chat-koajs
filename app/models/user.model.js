@@ -51,6 +51,8 @@ exports.User = User
 
 const { UserLoginCode } = require('./user-loging-code.model')
 const { ChatMessage } = require('./chat-message.model')
+const { UserChat } = require('./user-chat.model')
+const { Chat } = require('./chat.model')
 
 User.hasMany(UserLoginCode, {
   as: 'loginCodes',
@@ -65,3 +67,5 @@ User.hasMany(ChatMessage, {
   onUpdate: 'CASCADE',
   onDelete: 'CASCADE'
 })
+
+User.belongsToMany(Chat, { through: UserChat })
