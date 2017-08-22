@@ -57,7 +57,7 @@ exports.login = async ctx => {
   ctx.body = {
     token: 'JWT ' + token,
     status: 200,
-    message: 'message'
+    message: 'success'
   }
   loginCode.expiredAt = moment().toISOString()
   await loginCode.save()
