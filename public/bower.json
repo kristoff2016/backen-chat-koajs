@@ -1,0 +1,23 @@
+{
+  "name": "client-chat",
+  "authors": [
+    "Kristoff"
+  ],
+  "description": "chat messenger",
+  "main": "index.html",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components"
+  ],
+  "dependencies": {
+    "angular": "^1.5.2",
+    "angular-route": "^1.5.2",
+    "ng-token-auth": "^0.0.28",
+    "angular-cookie": "^4.1.0"
+  }
+}
