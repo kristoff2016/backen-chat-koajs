@@ -18,12 +18,13 @@ SevakamApp.factory('AuthService', function ($http, SERVER) {
       }
     )
   }
-  authService.profiles = function (credentials) {
+  authService.profiles = function (credentials, token) {
     return $http({
       method: 'PUT',
       url: SERVER.api + 'profiles',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        Authorization: token
       },
       data: credentials
     }).then(

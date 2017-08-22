@@ -5,8 +5,8 @@ SevakamApp.controller('LoginController', function ($scope, $rootScope, AuthServi
   $scope.credentials = {
     email: '',
     code: '',
-    firstname: '',
-    lastname: ''
+    firstName: '',
+    lastName: ''
   }
   /**
  * step enter email address
@@ -45,20 +45,20 @@ SevakamApp.controller('LoginController', function ($scope, $rootScope, AuthServi
         }
         AuthService.login(credentials).then(function (res) {
           if (res.status === 200) {
-            $scope.msg = 'Login success'
-            $scope.msgSuccess = true
+            $scope.msg = undefined
             $scope.loading = false
             $scope.selection = 'fullname'
             $rootScope.checkInfo = true
+            $rootScope.token = res.token
           }
         })
       } else {
-        if (!credentials.firstname) {
+        if (!credentials.firstName) {
           $scope.msgSuccess = false
           $scope.loading = false
           $scope.msg = 'Please enter your firstname'
           return
-        } else if (!credentials.lastname) {
+        } else if (!credentials.lastName) {
           $scope.msgSuccess = false
           $scope.loading = false
           $scope.msg = 'Please enter your lastname'
@@ -69,11 +69,24 @@ SevakamApp.controller('LoginController', function ($scope, $rootScope, AuthServi
           $scope.msg = 'Please upload your profile'
           return
         }
-        AuthService.profiles(credentials).then(function (res) {
+        $scope.userData = {
+          firstName: credentials.firstName,
+          lastName: credentials.lastName,
+          imageUrl: $rootScope.imageUrl
+        }
+        AuthService.profiles($scope.userData, $rootScope.token).then(function (res) {
           if (res.status === 200) {
+            $scope.userData = {
+              email: res.email,
+              firstName: res.firstName,
+              lastName: res.lastName,
+              imageUrl: res.imageUrl,
+              token: $rootScope.token
+            }
+            localStorage.setItem('userAuth', JSON.stringify($scope.userData))
+            location.href = '/index.html'
           }
         })
-        // localStorage.setItem('userAuth', JSON.stringify(res))
       }
     }
   }

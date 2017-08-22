@@ -1,3 +1,3 @@
 SevakamApp.constant('SERVER', {
-  api: 'https://messenger-backend.herokuapp.com/vi1/'
+  api: 'http://localhost:5000/v1/'
 })

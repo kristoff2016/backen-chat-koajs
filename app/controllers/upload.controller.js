@@ -2,12 +2,12 @@ exports.singleImageUploader = async ctx => {
   const hostname = ctx.headers.host
   const { file } = ctx.req
   const { filename } = file
-  ctx.body = { url: hostname + '/storage/images/' + filename }
+  ctx.body = { url: 'http://localhost:5000/storage/images/' + filename }
 }
 
 exports.singleVideoUploader = async ctx => {
   const hostname = ctx.headers.host
   const { file } = ctx.req
   const { filename } = file
-  ctx.body = { url: hostname + '/storage/videos/' + filename }
+  ctx.body = { url: 'http://localhost:5000/storage/videos/' + filename }
 }

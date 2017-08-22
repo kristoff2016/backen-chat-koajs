@@ -17,7 +17,7 @@
           <strong>Sign in</strong>
         </header>
         <form action="javascript:void(0)" class="panel-body wrapper-lg"  ng-switch on="selection">
-          <div class="alert animated fadeInUp m-b" ng-class="msgSuccess? 'alert-success':'alert-danger'" ng-show="msg">
+          <div class="alert animated fadeInUp m-b-lg" ng-class="msgSuccess? 'alert-success':'alert-danger'" ng-show="msg">
             <button type="button" class="close" ng-click="onCloseMessage()">&times;</button>
             <i class="fa fa-ban-circle"></i><strong> {{ msg }} </strong> 
           </div>
@@ -36,8 +36,8 @@
               <label class="control-label step-title">Complete your information</label>
               <img ng-src="{{ imageUrl }}" alt="avatar default" class="img-responsive avatar-default" ng-click="uploadImage()"/>
               <input id="upload-image" class="send-image-upload" name="files" onchange="angular.element(this).scope().onUploadImageChat(angular.element(this).scope().userChat)" type="file" accept="image/*">
-              <input type="text" placeholder="Enter firstname" ng-model="credentials.firstname" class="form-control m-t">
-              <input type="text" placeholder="Enter lastname" ng-model="credentials.lastname" class="form-control m-t">
+              <input type="text" placeholder="Enter firstname" ng-model="credentials.firstName" class="form-control m-t">
+              <input type="text" placeholder="Enter lastname" ng-model="credentials.lastName" class="form-control m-t">
           </div>
 
           <button type="submit" ng-click="login(credentials)" class="btn btn-primary pull-right">Next <span class="fa fa-spinner fa-1x fa-spin text-center text-white" ng-show="loading"></span> </button>

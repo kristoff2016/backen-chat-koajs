@@ -86,11 +86,13 @@
   border: 2px solid #0bb0e2;
   border-radius: 50%;
   cursor: pointer;
+  width: 90px;
+  height: 90px;
 }
-#upload-image{
+#upload-image {
   display: none;
 }
-.step-title{
+.step-title {
   margin: 0 auto;
   display: block;
   font-size: 16px;
