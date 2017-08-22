@@ -1,1 +1,1 @@
-sass --watch public/sass/app.scss:public/css/app.css --style compressed
+sass --watch sass/app.scss:css/app.css --style compressed
