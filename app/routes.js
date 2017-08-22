@@ -1,10 +1,7 @@
 const WelcomeController = require('./controllers/welcome.controller')
 const UserController = require('./controllers/user.controller')
-<<<<<<< HEAD
 const ChatController = require('./controllers/chat.controller')
-=======
 const GeneralController = require('./controllers/upload.controller')
->>>>>>> 5d759fa4208152572c3536e378416d24169ed9dd
 const { validateEmail, validateLogin } = require('./middleware/user.middleware')
 const { isMultiPart, singleUpload, singleVideoUpload } = require('./middleware/upload.middleware')
 
