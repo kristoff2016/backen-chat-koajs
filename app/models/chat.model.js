@@ -8,6 +8,7 @@ const attributes = {
   },
   title: {
     type: STRING,
+    defaultValue: 'Default Chat',
     allowNull: false
   }
 }
