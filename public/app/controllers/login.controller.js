@@ -1,4 +1,4 @@
-SevakamApp.controller('LoginController', function ($scope, $rootScope, AuthService, $http, $location) {
+SevakamApp.controller('LoginController', function ($scope, $rootScope, AuthService, UploadService, $http, $location) {
   if ($rootScope.userAuth) {
     location.href = '/index.html'
   }
@@ -15,6 +15,7 @@ SevakamApp.controller('LoginController', function ($scope, $rootScope, AuthServi
   $rootScope.checkLogin = false
   $rootScope.checkInfo = false
   $scope.selection = 'email'
+  $rootScope.imageUrl = 'img/avatar_default.jpg'
   $scope.login = function (credentials) {
     $scope.loading = true
     if ($rootScope.checkLogin === false) {
@@ -76,7 +77,23 @@ SevakamApp.controller('LoginController', function ($scope, $rootScope, AuthServi
       }
     }
   }
+  /**
+   *  on upload image
+   */
 
+  $scope.uploadImage = function () {
+    $('#upload-image').click()
+  }
+  $scope.onUploadImageChat = function () {
+    var file = document.getElementById('upload-image').files[0]
+    var fd = new FormData($('#form-private-chat')[0])
+    fd.append('file', file)
+    UploadService.uploadImage({
+      data: fd
+    }).then(function (res) {
+      $rootScope.imageUrl = res.url
+    })
+  }
   $scope.onCloseMessage = function () {
     $scope.msg = undefined
   }
