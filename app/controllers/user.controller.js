@@ -75,6 +75,8 @@ exports.updateUserProfile = async ctx => {
     throw new BadRequestError('First name and last name are required.')
   }
 
+  ctx.status = 200
+  ctx.message = 'Your user profile have been updatad!'
   ctx.body = await global.db.transaction(async t => {
     const queryOptions = { transaction: t }
     currentUser.firstName = `${firstName}`.trim()
@@ -83,7 +85,6 @@ exports.updateUserProfile = async ctx => {
 
     await currentUser.save(queryOptions)
     await currentUser.reload(queryOptions)
-
     return currentUser.toJSON()
   })
 }
