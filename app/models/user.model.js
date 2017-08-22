@@ -6,6 +6,10 @@ const attributes = {
     primaryKey: true,
     type: INTEGER
   },
+  sid: {
+    type: STRING,
+    unique: true
+  },
   email: {
     type: STRING,
     allowedNull: false,
