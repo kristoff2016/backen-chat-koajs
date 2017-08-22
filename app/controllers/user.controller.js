@@ -40,7 +40,7 @@ exports.getLoginCode = async ctx => {
     }
     await transport.sendMail(message)
     ctx.body = {
-      message: 'Please check your email. We sent you code!',
+      message: 'We sent you an email. Please check your email',
       status: 200
     }
   } catch (error) {
@@ -54,11 +54,11 @@ exports.login = async ctx => {
   const userJSON = user.toJSON()
   delete userJSON.password
   const token = await jwt.sign(userJSON, config.jwt.secret, { expiresIn: '1 day' })
-
   ctx.body = {
-    token: 'JWT ' + token
+    token: 'JWT ' + token,
+    status: 200,
+    message: 'message'
   }
-
   loginCode.expiredAt = moment().toISOString()
   await loginCode.save()
 }

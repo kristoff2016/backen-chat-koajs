@@ -1,7 +1,13 @@
 const WelcomeController = require('./controllers/welcome.controller')
 const UserController = require('./controllers/user.controller')
+<<<<<<< HEAD
 const ChatController = require('./controllers/chat.controller')
+=======
+const GeneralController = require('./controllers/upload.controller')
+>>>>>>> 5d759fa4208152572c3536e378416d24169ed9dd
 const { validateEmail, validateLogin } = require('./middleware/user.middleware')
+const { isMultiPart, singleUpload, singleVideoUpload } = require('./middleware/upload.middleware')
+
 const { isAuthenticated } = require('./middleware/auth.middleware')
 module.exports = [
   {
@@ -27,6 +33,23 @@ module.exports = [
   // edit
   // delete
 
+  {
+    prefix: '/v1/upload',
+    routes: [
+      {
+        method: 'POST',
+        path: '/images',
+        middleware: [ singleUpload, isMultiPart ],
+        handler: GeneralController.singleImageUploader
+      },
+      {
+        method: 'POST',
+        path: '/videos',
+        middleware: [ singleVideoUpload, isMultiPart ],
+        handler: GeneralController.singleVideoUploader
+      }
+    ]
+  },
   {
     prefix: '/v1/login',
     routes: [
