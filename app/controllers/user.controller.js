@@ -69,7 +69,7 @@ exports.getUserProfile = async ctx => {
 
 exports.updateUserProfile = async ctx => {
   const { currentUser } = ctx.state
-  const { firstName, lastName } = ctx.request.body
+  const { firstName, lastName, imageUrl } = ctx.request.body
 
   if (!firstName && !lastName) {
     throw new BadRequestError('First name and last name are required.')
@@ -79,10 +79,21 @@ exports.updateUserProfile = async ctx => {
     const queryOptions = { transaction: t }
     currentUser.firstName = `${firstName}`.trim()
     currentUser.lastName = `${lastName}`.trim()
+    currentUser.imageUrl = `${imageUrl}`.trim()
 
     await currentUser.save(queryOptions)
     await currentUser.reload(queryOptions)
 
     return currentUser.toJSON()
   })
+}
+
+exports.listUser = async ctx => {
+  let limit = ctx.request.query.limit || 10
+  let offset = ctx.request.query.offset || 0
+
+  const users = await User.findAll({ limit: limit * 1, offset: offset * 1 })
+
+  ctx.state = 200
+  ctx.body = users
 }
