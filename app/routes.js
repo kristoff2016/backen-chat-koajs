@@ -3,7 +3,7 @@ const UserController = require('./controllers/user.controller')
 const ChatController = require('./controllers/chat.controller')
 const ChatMessageController = require('./controllers/chat-message.controller')
 const GeneralController = require('./controllers/upload.controller')
-const { validateEmail, validateLogin } = require('./middleware/user.middleware')
+const { validateEmail, validateLogin, validateUser } = require('./middleware/user.middleware')
 const { findChat } = require('./middleware/chat.middleware')
 const { validateContent, validateChat, validateChatMessage } = require('./middleware/chat-message.middleware')
 const { isMultiPart, singleUpload, singleVideoUpload } = require('./middleware/upload.middleware')
@@ -92,7 +92,13 @@ module.exports = [
     prefix: '/v1/profiles',
     routes: [
       { method: 'GET', path: '/', middleware: [ isAuthenticated ], handler: UserController.getUserProfile },
-      { method: 'PUT', path: '/', middleware: [ isAuthenticated ], handler: UserController.updateUserProfile }
+      { method: 'PUT', path: '/', middleware: [ isAuthenticated ], handler: UserController.updateUserProfile },
+      {
+        method: 'DELETE',
+        path: '/:id',
+        middleware: [ isAuthenticated, validateUser ],
+        handler: UserController.deleteUserProfile
+      }
     ]
   }
 ]
