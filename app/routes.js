@@ -42,7 +42,7 @@ module.exports = [
       },
       {
         method: 'PUT',
-        path: '/:id/message/:messageId', // DEL /v1/chat/1/messages/10
+        path: '/:id/message/:messageId',
         middleware: [ isAuthenticated, validateContent, validateChat, validateChatMessage ],
         handler: ChatMessageController.editMessage
       },
