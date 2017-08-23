@@ -3,6 +3,7 @@ const UserController = require('./controllers/user.controller')
 const ChatController = require('./controllers/chat.controller')
 const GeneralController = require('./controllers/upload.controller')
 const { validateEmail, validateLogin } = require('./middleware/user.middleware')
+const { findChat } = require('./middleware/chat.middleware')
 const { isMultiPart, singleUpload, singleVideoUpload } = require('./middleware/upload.middleware')
 
 const { isAuthenticated } = require('./middleware/auth.middleware')
@@ -16,8 +17,8 @@ module.exports = [
     routes: [
       { method: 'GET', path: '/', middleware: [], handler: UserController.listUser },
       { method: 'POST', path: '/', middleware: [ isAuthenticated ], handler: ChatController.createChat },
-      { method: 'POST', path: '/:id/invites', middleware: [ isAuthenticated ], handler: ChatController.inviteUser },
-      { method: 'POST', path: '/:id/kicks', middleware: [ isAuthenticated ], handler: ChatController.kickUser }
+      { method: 'POST', path: '/:id/invites', middleware: [ isAuthenticated, findChat ], handler: ChatController.inviteUser },
+      { method: 'POST', path: '/:id/kicks', middleware: [ isAuthenticated, findChat ], handler: ChatController.kickUser }
     ]
   },
 
