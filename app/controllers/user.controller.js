@@ -98,3 +98,13 @@ exports.listUser = async ctx => {
   ctx.state = 200
   ctx.body = users
 }
+
+exports.deleteUserProfile = async ctx => {
+  const { currentUser } = ctx.state
+  const { id } = currentUser
+  await global.db.transaction(async t => {
+    const queryOptions = { transaction: t }
+    return User.destroy({ where: { id }, ...queryOptions })
+  })
+  ctx.body = { message: 'success', status: 200 }
+}
