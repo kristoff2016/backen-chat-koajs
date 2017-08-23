@@ -15,11 +15,9 @@ exports.getLoginCode = async ctx => {
   try {
     const [ user ] = await User.findOrCreate({
       where: { email },
-      defaults: { email },
+      defaults: { email, sid: uuidv4() },
       transaction: t
     })
-
-    await user.update({ sid: uuidv4() }, { transaction: t })
 
     await UserLoginCode.create(
       {
