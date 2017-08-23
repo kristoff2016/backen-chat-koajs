@@ -26,26 +26,28 @@ exports.getLoginCode = async ctx => {
       { transaction: t }
     )
     await t.commit()
-    // send code verify account
-    const compileFunc = pug.compileFile('app/views/template/email.pug')
-    const html = compileFunc({
-      code
-    })
-    let message = {
-      from: 'API League <brainmusic2017@gmail.com>',
-      to: email,
-      subject: 'Pathmazing Messenger',
-      generateTextFromHTML: true,
-      html
-    }
-    await transport.sendMail(message)
-    ctx.body = {
-      message: 'We sent you an email. Please check your email',
-      status: 200
-    }
   } catch (error) {
     await t.rollback()
     throw error
+  }
+
+  // send code verify account
+  const compileFunc = pug.compileFile('app/views/template/email.pug')
+  const html = compileFunc({
+    code
+  })
+  let message = {
+    from: 'API League <brainmusic2017@gmail.com>',
+    to: email,
+    subject: 'Pathmazing Messenger',
+    generateTextFromHTML: true,
+    html
+  }
+  await transport.sendMail(message)
+
+  ctx.body = {
+    message: 'We sent you an email. Please check your email',
+    status: 200
   }
 }
 
