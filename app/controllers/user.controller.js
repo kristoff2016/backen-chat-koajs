@@ -6,6 +6,7 @@ const { transport } = require('../../helpers/email')
 const { BadRequestError } = require('../../helpers/httpError')
 const jwt = require('../../helpers/jwt')
 const config = require('../../config')
+const uuidv4 = require('uuid/v4')
 
 exports.getLoginCode = async ctx => {
   const { email } = ctx.request.body
@@ -17,6 +18,9 @@ exports.getLoginCode = async ctx => {
       defaults: { email },
       transaction: t
     })
+
+    await user.update({ sid: uuidv4() }, { transaction: t })
+
     await UserLoginCode.create(
       {
         code,
