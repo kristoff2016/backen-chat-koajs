@@ -3,7 +3,7 @@ const _ = require('lodash')
 const { UserChat } = require('../models/user-chat.model')
 const { Chat } = require('../models/chat.model')
 
-const { BadRequestError } = require('../../helpers/httpError')
+// const { BadRequestError } = require('../../helpers/httpError')
 
 exports.createChat = async ctx => {
   const { currentUser } = ctx.state
@@ -11,7 +11,7 @@ exports.createChat = async ctx => {
   const t = await global.db.transaction()
 
   try {
-    const chat = await Chat.create({ transaction: t })
+    const chat = await Chat.create({}, { transaction: t })
     const chatId = chat.id
     const userId = currentUser.id
     userChatIds.push(userId)
@@ -35,15 +35,7 @@ exports.createChat = async ctx => {
 exports.inviteUser = async ctx => {
   const { id: chatId } = ctx.params
   const { userIds } = ctx.request.body // [1, 2]
-
-  // check chat  exists
-  const chat = await Chat.findOne({
-    where: {
-      id: chatId
-    }
-  })
-
-  if (!chat) throw new BadRequestError('Chat was not found')
+  const { chat } = ctx.state
 
   const userChats = await UserChat.findAll({
     where: { chatId }
@@ -66,23 +58,15 @@ exports.inviteUser = async ctx => {
 
   ctx.status = 200
   ctx.body = {
-    chat,
-    newUserChats
+    chat: chat.toJSON(),
+    userChats: newUserChats
   }
 }
 
 exports.kickUser = async ctx => {
   const { id: chatId } = ctx.params
   const { userIds } = ctx.request.body // [1, 2]
-
-  // check chat  exists
-  const chat = await Chat.findOne({
-    where: {
-      id: chatId
-    }
-  })
-
-  if (!chat) throw new BadRequestError('Chat was not found')
+  const { chat } = ctx.state
 
   const userChats = await UserChat.findAll({
     where: { chatId }
@@ -94,25 +78,24 @@ exports.kickUser = async ctx => {
   const userChatsToBeKick = kickedUserIds.map(u => u)
 
   let newUserChats
+
   await global.db.transaction(async t => {
     const queryOptions = { transaction: t }
-    await UserChat.destroy(
-      {
-        where: {
-          userId: {
-            $in: userChatsToBeKick
-          },
-          chatId
-        }
+    await UserChat.destroy({
+      where: {
+        userId: {
+          $in: userChatsToBeKick
+        },
+        chatId
       },
-      queryOptions
-    )
+      ...queryOptions
+    })
     newUserChats = await UserChat.findAll({ where: { chatId }, ...queryOptions })
   })
 
   ctx.status = 200
   ctx.body = {
-    chat,
-    newUserChats
+    chat: chat.toJSON(),
+    userChats: newUserChats
   }
 }

@@ -6,6 +6,7 @@ const { transport } = require('../../helpers/email')
 const { BadRequestError } = require('../../helpers/httpError')
 const jwt = require('../../helpers/jwt')
 const config = require('../../config')
+const uuidv4 = require('uuid/v4')
 
 exports.getLoginCode = async ctx => {
   const { email } = ctx.request.body
@@ -14,9 +15,10 @@ exports.getLoginCode = async ctx => {
   try {
     const [ user ] = await User.findOrCreate({
       where: { email },
-      defaults: { email },
+      defaults: { email, sid: uuidv4() },
       transaction: t
     })
+
     await UserLoginCode.create(
       {
         code,
@@ -99,4 +101,14 @@ exports.listUser = async ctx => {
 
   ctx.state = 200
   ctx.body = users
+}
+
+exports.deleteUserProfile = async ctx => {
+  const { currentUser } = ctx.state
+  const { id } = currentUser
+  await global.db.transaction(async t => {
+    const queryOptions = { transaction: t }
+    return User.destroy({ where: { id }, ...queryOptions })
+  })
+  ctx.body = { message: 'success', status: 200 }
 }
