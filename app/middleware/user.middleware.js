@@ -27,3 +27,9 @@ exports.validateLogin = async (ctx, next) => {
   if (moment().isAfter(expire)) throw new BadRequestError('Code is expired!')
   await next()
 }
+
+exports.validateUser = async (ctx, next) => {
+  const { currentUser } = ctx.state
+  if (currentUser.id !== +ctx.params.id) throw new BadRequestError('Can not delete other user account.')
+  await next()
+}
