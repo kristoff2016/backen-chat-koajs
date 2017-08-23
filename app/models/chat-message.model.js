@@ -17,6 +17,10 @@ const attributes = {
   videoUrl: {
     type: STRING,
     allowNull: true
+  },
+  chatId: {
+    type: INTEGER,
+    allowNull: false
   }
 }
 const modelOptions = {
