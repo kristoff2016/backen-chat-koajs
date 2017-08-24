@@ -113,3 +113,10 @@ exports.kickUser = async ctx => {
 
   await emitChatUserEvent(ctx, 'kickUser', result)
 }
+
+exports.listChat = async ctx => {
+  const { id: userId } = ctx.state.currentUser
+  const userChats = await UserChat.findAll({ where: { userId }, include: [ Chat ] })
+  const chatList = userChats.map(userChat => userChat.chat)
+  ctx.body = { message: 'success', status: 200, chatList }
+}
