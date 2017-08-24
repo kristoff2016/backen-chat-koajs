@@ -1,9 +1,16 @@
 const _ = require('lodash')
-// const { User } = require('../models/user.model')
+const { User } = require('../models/user.model')
 const { UserChat } = require('../models/user-chat.model')
 const { Chat } = require('../models/chat.model')
 
-// const { BadRequestError } = require('../../helpers/httpError')
+const emitChatUserEvent = async (ctx, eventName, payload) => {
+  const { chatId, userId } = payload
+  const userChats = await UserChat.findAll({ where: { chatId, userId }, include: [ User ] })
+  for (let { user } of userChats) {
+    const { sid } = user
+    ctx.io.of('/chatuser').to(sid).emit(eventName, payload)
+  }
+}
 
 exports.createChat = async ctx => {
   const { currentUser } = ctx.state
@@ -21,11 +28,13 @@ exports.createChat = async ctx => {
     const userChats = await UserChat.bulkCreate(userchatsToBeCreated, { transaction: t })
     await t.commit()
 
-    ctx.status = 200
-    ctx.body = {
+    const result = {
       chat,
       userChats
     }
+    ctx.status = 200
+    ctx.body = result
+    await emitChatUserEvent(ctx, 'createChat', result)
   } catch (error) {
     await t.rollback()
     throw error
@@ -55,12 +64,13 @@ exports.inviteUser = async ctx => {
     await UserChat.bulkCreate(userChatsToBeCreated, queryOptions)
     newUserChats = await UserChat.findAll({ where: { chatId }, ...queryOptions })
   })
-
-  ctx.status = 200
-  ctx.body = {
+  const result = {
     chat: chat.toJSON(),
     userChats: newUserChats
   }
+  ctx.status = 200
+  ctx.body = result
+  await emitChatUserEvent(ctx, 'inviteUser', result)
 }
 
 exports.kickUser = async ctx => {
@@ -93,9 +103,13 @@ exports.kickUser = async ctx => {
     newUserChats = await UserChat.findAll({ where: { chatId }, ...queryOptions })
   })
 
-  ctx.status = 200
-  ctx.body = {
+  const result = {
     chat: chat.toJSON(),
     userChats: newUserChats
   }
+
+  ctx.status = 200
+  ctx.body = result
+
+  await emitChatUserEvent(ctx, 'kickUser', result)
 }
