@@ -1,13 +1,22 @@
+const cloudinary = require('cloudinary')
+const fs = require('fs')
+
+cloudinary.config({
+  cloud_name: 'dqgbojnjw',
+  api_key: '718849549584692',
+  api_secret: 'MwLp_MwKDmzcwcx5A9EgT3piHi8'
+})
+
 exports.singleImageUploader = async ctx => {
-  const hostname = ctx.headers.host
   const { file } = ctx.req
-  const { filename } = file
-  ctx.body = { url: 'http://localhost:5000/storage/images/' + filename }
+  const result = await cloudinary.uploader.upload(file.path)
+  fs.unlinkSync(file.path)
+  ctx.body = result
 }
 
 exports.singleVideoUploader = async ctx => {
-  const hostname = ctx.headers.host
   const { file } = ctx.req
-  const { filename } = file
-  ctx.body = { url: 'http://localhost:5000/storage/videos/' + filename }
+  const result = await cloudinary.v2.uploader.upload(file.path, { resource_type: 'video' })
+  fs.unlinkSync(file.path)
+  ctx.body = result
 }
