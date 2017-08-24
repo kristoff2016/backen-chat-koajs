@@ -17,7 +17,8 @@ module.exports = [
   {
     prefix: '/v1/chats',
     routes: [
-      { method: 'GET', path: '/', middleware: [], handler: UserController.listUser },
+      // list chat
+      { method: 'GET', path: '/', middleware: [ isAuthenticated ], handler: ChatController.listChat },
       { method: 'POST', path: '/', middleware: [ isAuthenticated ], handler: ChatController.createChat },
       {
         method: 'POST',
