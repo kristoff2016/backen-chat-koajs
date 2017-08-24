@@ -99,3 +99,13 @@ exports.kickUser = async ctx => {
     userChats: newUserChats
   }
 }
+
+exports.listChat = async ctx => {
+  const { id: userId } = ctx.state.currentUser
+  const userChats = await UserChat.findAll({ where: { userId }, include: [ Chat ] })
+  let chatList = []
+  for (const userChat of userChats) {
+    chatList.push(userChat.chat)
+  }
+  ctx.body = { message: 'success', status: 200, chatList }
+}
