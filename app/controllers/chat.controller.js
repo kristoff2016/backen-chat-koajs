@@ -2,6 +2,7 @@ const _ = require('lodash')
 const { User } = require('../models/user.model')
 const { UserChat } = require('../models/user-chat.model')
 const { Chat } = require('../models/chat.model')
+const { ChatMessage } = require('../models/chat-message.model')
 
 const emitChatUserEvent = async (ctx, eventName, payload) => {
   const { chatId, userId } = payload
@@ -162,7 +163,24 @@ exports.kickUser = async ctx => {
 
 exports.listChat = async ctx => {
   const { id: userId } = ctx.state.currentUser
-  const userChats = await UserChat.findAll({ where: { userId }, include: [ Chat ] })
-  const chatList = userChats.map(userChat => userChat.chat)
-  ctx.body = { message: 'success', status: 200, chatList }
+  let userChats = await UserChat.findAll({ where: { userId }, include: [ User, Chat ] })
+  let chatIdList = userChats.map(userChat => userChat.chatId)
+
+  const chatMessage = await ChatMessage.findAll({
+    where: { chatId: chatIdList },
+    limit: 1,
+    order: [ [ 'createdAt', 'DESC' ] ]
+  })
+
+  const chatList = userChats.map(userChat => {
+    const { firstName, lastName, imageUrl } = userChat.user
+    const { id, title } = userChat.chat
+    let content = ''
+    if (chatMessage.length !== 0) {
+      content = chatMessage[0].content
+    }
+    return { id, title, firstName, lastName, imageUrl, content }
+  })
+
+  ctx.body = { message: 'success', status: 200, data: chatList }
 }
