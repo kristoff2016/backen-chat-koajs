@@ -164,7 +164,7 @@ exports.kickUser = async ctx => {
 exports.listChat = async ctx => {
   const { id } = ctx.state.currentUser
   const users = await User.find({
-    where: { id:2 },
+    where: { id },
     include: [ { model: Chat, as: 'chats' } ]
   })
   const chats = users.chats.map(chat => chat.get())
