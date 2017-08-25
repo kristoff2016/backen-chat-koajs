@@ -163,9 +163,9 @@ exports.getChatUserDoc = async ctx => {
     * @apiGroup Chat
     *
     * @apiParam {Number} id Chats unique ID.
-    * @apiParam {String} order Fieldname to order user if there is <code>-</code> infront will order by descending else order ascending.
-    * @apiParam {Number} limit Limit query of user default to <code>10</code>.
-    * @apiParam {Number} offset Offset query of user.
+    * @apiParam {String} [order] Fieldname to order user if there is <code>-</code> infront will order by descending else order ascending.
+    * @apiParam {Number} [limit=10] Limit query of user.
+    * @apiParam {Number} [offset=0] Offset query of user.
     *
     * @apiSuccessExample {json} Response (example):
     {
@@ -199,9 +199,9 @@ exports.getChatMessageDoc = async ctx => {
     * @apiGroup Chat
     *
     * @apiParam {Number} id Chats unique ID.
-    * @apiParam {String} order Fieldname to order user if there is <code>-</code> infront will order by descending else order ascending.
-    * @apiParam {Number} limit Limit query of user default to <code>10</code>.
-    * @apiParam {Number} offset Offset query of user.
+    * @apiParam {String} [order] Fieldname to order user if there is <code>-</code> infront will order by descending else order ascending.
+    * @apiParam {Number} [limit=10] Limit query of user.
+    * @apiParam {Number} [offset=0] Offset query of user.
     *
     * @apiSuccessExample {json} Response (example):
     {
