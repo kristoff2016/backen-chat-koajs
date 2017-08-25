@@ -32,6 +32,18 @@ module.exports = [
         path: '/:id/kicks',
         middleware: [ isAuthenticated, findChat ],
         handler: ChatController.kickUser
+      },
+      {
+        method: 'GET',
+        path: '/:id/messages',
+        middleware: [ isAuthenticated, validateChat ],
+        handler: ChatController.getChatMessage
+      },
+      {
+        method: 'GET',
+        path: '/:id/users',
+        middleware: [ isAuthenticated, validateChat ],
+        handler: ChatController.getChatUser
       }
     ]
   },
