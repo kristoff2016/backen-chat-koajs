@@ -29,20 +29,18 @@ exports.createChat = async ctx => {
     const userChats = await UserChat.bulkCreate(userchatsToBeCreated, { transaction: t })
     await t.commit()
     const newUserId = userChats.map(uid => uid.userId)
-
     let newUser = await User.findAll({
       where: {
         id: {
           $in: newUserId
         }
-      }
+      },
+      raw: true
     })
-    const userStr = JSON.stringify(newUser)
-    const userParse = JSON.parse(userStr)
 
-    for (let i in userParse) {
-      userParse[i].screenName = userParse[i].firstName + ' ' + userParse[i].lastName
-      newUser = userParse[i]
+    for (let i in newUser) {
+      newUser[i].screenName = newUser[i].firstName + ' ' + newUser[i].lastName
+      newUser = newUser[i]
     }
 
     const result = {
@@ -63,14 +61,11 @@ exports.inviteUser = async ctx => {
   const { id: chatId } = ctx.params
   const { userIds } = ctx.request.body // [1, 2]
   const { chat } = ctx.state
-
   const userChats = await UserChat.findAll({
     where: { chatId }
   })
   const invitedUsersIds = userChats.map(uc => uc.userId) // [2, 3]
-
   const uninvitedUserIds = _.difference(userIds, invitedUsersIds)
-
   const userChatsToBeCreated = uninvitedUserIds.map(u => ({
     userId: u,
     chatId
@@ -88,16 +83,13 @@ exports.inviteUser = async ctx => {
           $in: userChatIds
         }
       },
+      raw: true,
       ...queryOptions
     })
   })
-
-  const userStr = JSON.stringify(newUser)
-  const userParse = JSON.parse(userStr)
-
-  for (let i in userParse) {
-    userParse[i].screenName = userParse[i].firstName + ' ' + userParse[i].lastName
-    newUser = userParse[i]
+  for (let i in newUser) {
+    newUser[i].screenName = newUser[i].firstName + ' ' + newUser[i].lastName
+    newUser = newUser[i]
   }
   const result = {
     chat: chat.toJSON(),
@@ -144,16 +136,14 @@ exports.kickUser = async ctx => {
           $in: userChatIds
         }
       },
+      raw: true,
       ...queryOptions
     })
   })
 
-  const userStr = JSON.stringify(newUser)
-  const userParse = JSON.parse(userStr)
-
-  for (let i in userParse) {
-    userParse[i].screenName = userParse[i].firstName + ' ' + userParse[i].lastName
-    newUser = userParse[i]
+  for (let i in newUser) {
+    newUser[i].screenName = newUser[i].firstName + ' ' + newUser[i].lastName
+    newUser = newUser[i]
   }
   const result = {
     chat: chat.toJSON(),
