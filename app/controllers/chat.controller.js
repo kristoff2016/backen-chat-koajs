@@ -19,7 +19,7 @@ exports.createChat = async ctx => {
   const t = await global.db.transaction()
 
   try {
-    const chat = await Chat.create({ createdBy: currentUser.id }, { transaction: t })
+    const chat = await Chat.create({}, { transaction: t })
     const chatId = chat.id
     const userId = currentUser.id
     userChatIds.push(userId)
@@ -28,21 +28,6 @@ exports.createChat = async ctx => {
     })
     const userChats = await UserChat.bulkCreate(userchatsToBeCreated, { transaction: t })
     await t.commit()
-    const newUserId = userChats.map(uid => uid.userId)
-    let newUser = await User.findAll({
-      where: {
-        id: {
-          $in: newUserId
-        }
-      },
-      transaction: t
-    })
-    const userStr = JSON.stringify(newUser)
-    const userParse = JSON.parse(userStr)
-    for (let i in userParse) {
-      userParse[i].screenName = userParse[i].firstName + ' ' + userParse[i].lastName
-      newUser = userParse[i]
-    }
 
     const result = {
       chat,
@@ -74,32 +59,15 @@ exports.inviteUser = async ctx => {
     chatId
   }))
 
-  let newUserChats, newUser
+  let newUserChats
   await global.db.transaction(async t => {
     const queryOptions = { transaction: t }
     await UserChat.bulkCreate(userChatsToBeCreated, queryOptions)
     newUserChats = await UserChat.findAll({ where: { chatId }, ...queryOptions })
-    const newUserId = newUserChats.map(uid => uid.userId)
-    newUser = await User.findAll({
-      where: {
-        id: {
-          $in: newUserId
-        }
-      },
-      ...queryOptions
-    })
-    // const user = await User.findAll({where:  })
   })
-  const userStr = JSON.stringify(newUser)
-  const userParse = JSON.parse(userStr)
-  for (let i in userParse) {
-    userParse[i].screenName = userParse[i].firstName + ' ' + userParse[i].lastName
-    newUser = userParse[i]
-  }
   const result = {
     chat: chat.toJSON(),
-    userChats: newUserChats,
-    User: newUser
+    userChats: newUserChats
   }
   ctx.status = 200
   ctx.body = result
@@ -120,7 +88,8 @@ exports.kickUser = async ctx => {
 
   const userChatsToBeKick = kickedUserIds.map(u => u)
 
-  let newUserChats, newUser
+  let newUserChats
+
   await global.db.transaction(async t => {
     const queryOptions = { transaction: t }
     await UserChat.destroy({
@@ -133,26 +102,11 @@ exports.kickUser = async ctx => {
       ...queryOptions
     })
     newUserChats = await UserChat.findAll({ where: { chatId }, ...queryOptions })
-    const newUserId = newUserChats.map(uid => uid.userId)
-    newUser = await User.findAll({
-      where: {
-        id: {
-          $in: newUserId
-        }
-      },
-      ...queryOptions
-    })
   })
-  const userStr = JSON.stringify(newUser)
-  const userParse = JSON.parse(userStr)
-  for (let i in userParse) {
-    userParse[i].screenName = userParse[i].firstName + ' ' + userParse[i].lastName
-    newUser = userParse[i]
-  }
+
   const result = {
     chat: chat.toJSON(),
-    userChats: newUserChats,
-    User: newUser
+    userChats: newUserChats
   }
 
   ctx.status = 200
@@ -162,25 +116,43 @@ exports.kickUser = async ctx => {
 }
 
 exports.listChat = async ctx => {
+  /**
+   * @param id { user id }
+   */
+
   const { id } = ctx.state.currentUser
-  const users = await User.find({
-    where: { id },
-    include: [ { model: Chat, as: 'chats' } ]
+  const userChat = await UserChat.findAll({ where: { userId: id } })
+  let chatIdList = userChat.map(userChat => userChat.chatId)
+  let chatTitle = await Chat.findAll({ where: { id: { $in: chatIdList } } })
+  const chatTitleStr = JSON.stringify(chatTitle)
+  let chatTitleParse = JSON.parse(chatTitleStr)
+  const chatMessage = await ChatMessage.findAll({
+    where: { chatId: { $in: chatIdList } },
+    group: [ [ 'chatId', 'DESC' ] ]
   })
-  const chats = users.chats.map(chat => chat.get())
-  let data = []
-  for (let chat of chats) {
-    const chatMessage = await ChatMessage.findAll({
-      where: { chatId: chat.id },
-      limit: 1,
-      order: [ [ 'updatedAt', 'DESC' ] ]
-    })
-    let content = ''
-    if (chatMessage.length !== 0) {
-      content = chatMessage[0].content
+  const chatMessageStr = JSON.stringify(chatMessage)
+  let chatMessageParse = JSON.parse(chatMessageStr)
+  for (let i in chatMessageParse) {
+    for (let j in chatTitleParse) {
+      if (chatMessageParse[i].chatId === chatTitleParse[j].id) {
+        chatMessageParse[i].title = chatTitleParse[j].title
+        chatMessageParse[i].profile = chatTitleParse[i].imageUrl
+      }
     }
-    const { id, title, imageUrl, createdAt } = chat
-    data.push({ id, title, imageUrl, createdAt, content })
   }
-  ctx.body = { message: 'success', status: 200, data }
+  const userIds = chatMessageParse.map(chatMessageParse => chatMessageParse.userId)
+  const userData = await User.findAll({
+    where: { id: { $in: userIds } }
+  })
+  const userDataeStr = JSON.stringify(userData)
+  const userDataParse = JSON.parse(userDataeStr)
+  for (let i in userDataParse) {
+    userDataParse[i].screenName = userDataParse[i].firstName + ' ' + userDataParse[i].lastName
+    for (let j in userIds) {
+      if (userDataParse[i].id === userIds[j]) {
+        chatMessageParse[j].user = userDataParse[i]
+      }
+    }
+  }
+  ctx.body = { message: 'success', status: 200, data: chatMessageParse }
 }
