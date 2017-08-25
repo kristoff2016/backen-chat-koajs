@@ -10,6 +10,13 @@ const attributes = {
     type: STRING,
     defaultValue: 'Default Chat',
     allowNull: false
+  },
+  imageUrl: {
+    type: STRING
+  },
+  createdBy: {
+    type: INTEGER,
+    allowNull: false
   }
 }
 const modelOptions = {
