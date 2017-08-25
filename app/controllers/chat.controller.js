@@ -19,7 +19,7 @@ exports.createChat = async ctx => {
   const t = await global.db.transaction()
 
   try {
-    const chat = await Chat.create({ createdBy: currentUser.firstName }, { transaction: t })
+    const chat = await Chat.create({ createdBy: currentUser.id }, { transaction: t })
     const chatId = chat.id
     const userId = currentUser.id
     userChatIds.push(userId)
@@ -162,25 +162,25 @@ exports.kickUser = async ctx => {
 }
 
 exports.listChat = async ctx => {
-  const { id: userId } = ctx.state.currentUser
-  let userChats = await UserChat.findAll({ where: { userId }, include: [ User, Chat ] })
-  let chatIdList = userChats.map(userChat => userChat.chatId)
-
-  const chatMessage = await ChatMessage.findAll({
-    where: { chatId: chatIdList },
-    limit: 1,
-    order: [ [ 'createdAt', 'DESC' ] ]
+  const { id } = ctx.state.currentUser
+  const users = await User.find({
+    where: { id },
+    include: [ { model: Chat, as: 'chats' } ]
   })
-
-  const chatList = userChats.map(userChat => {
-    const { firstName, lastName, imageUrl } = userChat.user
-    const { id, title } = userChat.chat
+  const chats = users.chats.map(chat => chat.get())
+  let data = []
+  for (let chat of chats) {
+    const chatMessage = await ChatMessage.findAll({
+      where: { chatId: chat.id },
+      limit: 1,
+      order: [ [ 'updatedAt', 'DESC' ] ]
+    })
     let content = ''
     if (chatMessage.length !== 0) {
       content = chatMessage[0].content
     }
-    return { id, title, firstName, lastName, imageUrl, content }
-  })
-
-  ctx.body = { message: 'success', status: 200, data: chatList }
+    const { id, title, imageUrl, createdAt } = chat
+    data.push({ id, title, imageUrl, createdAt, content })
+  }
+  ctx.body = { message: 'success', status: 200, data }
 }
