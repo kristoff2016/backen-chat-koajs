@@ -214,3 +214,61 @@ exports.search = async ctx => {
   }
   ctx.body = { message: 'success', status: 200, data: users }
 }
+
+exports.getChatMessage = async ctx => {
+  const { id: chatId } = ctx.params
+  const limit = ctx.request.query.limit || 10
+  let order = ctx.request.query.order || '-createdAt'
+  let offset = ctx.request.query.offset || 0
+
+  if (order.startsWith('-')) {
+    order = [ order.replace('-', ''), 'DESC' ]
+  } else {
+    order = [ order ]
+  }
+
+  const chatMessages = await ChatMessage.findAll({
+    where: { chatId },
+    limit: +limit,
+    offset: offset * 1,
+    order: [ order ],
+    include: [ { model: User, as: 'user' } ]
+  })
+
+  const data = chatMessages.map(chatMessage => {
+    const { id, content, imageUrl, videoUrl, createdAt } = chatMessage
+    const { firstName, lastName, imageUrl: userImageUrl } = chatMessage.user
+    const fullName = `${firstName} ${lastName}`
+    return { id, content, imageUrl, videoUrl, createdAt, fullName, userImageUrl }
+  })
+
+  ctx.body = { message: 'success', status: 200, data }
+}
+
+exports.getChatUser = async ctx => {
+  const { id: chatId } = ctx.params
+  const limit = ctx.request.query.limit || 10
+  let order = ctx.request.query.order || 'id'
+  let offset = ctx.request.query.offset || 0
+
+  if (order.startsWith('-')) {
+    order = [ order.replace('-', ''), 'DESC' ]
+  } else {
+    order = [ order ]
+  }
+  const userChats = await UserChat.findAll({
+    where: { chatId }
+  })
+  const userIds = userChats.map(user => user.userId)
+
+  let users = await User.findAll({ where: { id: userIds }, limit: +limit, order: [ order ], offset: offset * 1 })
+
+  const data = users.map(user => {
+    const admin = user.id === ctx.state.chat.createdBy
+    const { id, firstName, lastName, imageUrl } = user
+    const fullName = `${firstName} ${lastName}`
+    return { id, fullName, imageUrl, admin }
+  })
+
+  ctx.body = { message: 'success', status: 200, data }
+}
