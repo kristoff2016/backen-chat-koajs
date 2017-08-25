@@ -16,11 +16,13 @@ const emitChatUserEvent = async (ctx, eventName, payload) => {
 exports.createChat = async ctx => {
   const { currentUser } = ctx.state
   const { userIds, title, imageUrl } = ctx.request.body
+  console.log('userIds===', userIds)
   const t = await global.db.transaction()
 
   try {
     const chat = await Chat.create({ title, imageUrl, createdBy: currentUser.id }, { transaction: t })
     const chatId = chat.id
+    console.log('chatId==', chatId)
     const userId = currentUser.id
     userIds.push(userId)
     const userchatsToBeCreated = userIds.map(userChatId => {
@@ -36,22 +38,21 @@ exports.createChat = async ctx => {
         }
       },
       raw: true
-    })
-
+    })   
     for (let i in newUser) {
       newUser[i].screenName = newUser[i].firstName + ' ' + newUser[i].lastName
-      newUser = newUser[i]
     }
-
     const result = {
       chat: chat.toJSON(),
       userChats: userChats,
       User: newUser
     }
+
     ctx.status = 200
     ctx.body = result
     await emitChatUserEvent(ctx, 'createChat', result)
   } catch (error) {
+    console.log('error=====', error)
     await t.rollback()
     throw error
   }
@@ -204,6 +205,12 @@ exports.listChat = async ctx => {
 exports.search = async ctx => {
   const { q } = ctx.query
   // const { offsests, limits } = ctx.req.body
-  const users = await User.findAll({ where: { email: { $like: '%' + q + '%' } }, raw: true })
+  const users = await User.findAll({
+    where: { email: { $like: '%' + q + '%' }, id: { $notIn: [ ctx.state.currentUser.id ] } },
+    raw: true
+  })
+  for (let i in users) {
+    users[i].screenName = users[i].firstName + ' ' + users[i].lastName
+  }
   ctx.body = { message: 'success', status: 200, data: users }
 }
