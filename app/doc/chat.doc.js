@@ -152,3 +152,81 @@ exports.kickUserChatDoc = async ctx => {
     *    }
   */
 }
+
+exports.getChatUserDoc = async ctx => {
+  /**
+    * @api {GET} /v1/chats/:id/users?order=:fieldName&limit=:limit&offset=:offset Request all users in chat.
+    *
+    * @apiHeader {String} Authorization JWT token of user.
+    *
+    * @apiName getChatUser
+    * @apiGroup Chat
+    *
+    * @apiParam {Number} id Chats unique ID.
+    * @apiParam {String} fieldName Fieldname to order user if there is <code>-</code> infront will order by descending else order ascending.
+    * @apiParam {Number} limit Limit query of user default to <code>10</code>.
+    * @apiParam {Number} offset Offset query of user.
+    *
+    * @apiSuccessExample {json} Response (example):
+    {
+        "message": "success",
+        "status": 200,
+        "data": [
+            {
+                "id": 2,
+                "fullName": "Lyheang IBell",
+                "imageUrl": "http://res.cloudinary.com/dqgbojnjw/image/upload/v1503645222/hmrp9ccrcsgnvjxqahbj.jpg",
+                "admin": false
+            },
+            {
+                "id": 4,
+                "fullName": "Shaw Ung",
+                "imageUrl": "https://res.cloudinary.com/dqgbojnjw/image/upload/t_media_lib_thumb/v1503633067/photo_2017-08-17_10-30-49_hztgab.jpg",
+                "admin": true
+            }
+        ]
+    }
+  */
+}
+
+exports.getChatMessageDoc = async ctx => {
+    /**
+    * @api {GET} /v1/chats/:id/messages?order=:fieldName&limit=:limit&offset=:offset Request all messages in chat.
+    *
+    * @apiHeader {String} Authorization JWT token of user.
+    *
+    * @apiName getChatMessage
+    * @apiGroup Chat
+    *
+    * @apiParam {Number} id Chats unique ID.
+    * @apiParam {String} fieldName Fieldname to order user if there is <code>-</code> infront will order by descending else order ascending.
+    * @apiParam {Number} limit Limit query of user default to <code>10</code>.
+    * @apiParam {Number} offset Offset query of user.
+    *
+    * @apiSuccessExample {json} Response (example):
+    {
+        "message": "success",
+        "status": 200,
+        "data": [
+            {
+                "id": 25,
+                "content": "Kkkk 25",
+                "imageUrl": null,
+                "videoUrl": null,
+                "createdAt": "2017-08-25T02:38:56.000Z",
+                "fullName": "Lyheang IBell",
+                "userImageUrl": "http://res.cloudinary.com/dqgbojnjw/image/upload/v1503645222/hmrp9ccrcsgnvjxqahbj.jpg"
+            },
+            {
+                "id": 29,
+                "content": "messager from shaw",
+                "imageUrl": null,
+                "videoUrl": null,
+                "createdAt": "2017-08-25T02:38:56.000Z",
+                "fullName": "Seyha Uung",
+                "userImageUrl": "https://res.cloudinary.com/dqgbojnjw/image/upload/t_media_lib_thumb/v1503633067/photo_2016-09-06_09-19-25_thruvb.jpg"
+            }
+        ]
+    }
+  */
+}
