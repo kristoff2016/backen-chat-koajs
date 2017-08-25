@@ -15,38 +15,40 @@ const emitChatUserEvent = async (ctx, eventName, payload) => {
 
 exports.createChat = async ctx => {
   const { currentUser } = ctx.state
-  const { userChatIds } = ctx.request.body
+  const { userIds, title, imageUrl } = ctx.request.body
   const t = await global.db.transaction()
 
   try {
-    const chat = await Chat.create({ createdBy: currentUser.firstName }, { transaction: t })
+    const chat = await Chat.create({ title, imageUrl, createdBy: currentUser.id }, { transaction: t })
     const chatId = chat.id
     const userId = currentUser.id
-    userChatIds.push(userId)
-    const userchatsToBeCreated = userChatIds.map(userChatId => {
+    userIds.push(userId)
+    const userchatsToBeCreated = userIds.map(userChatId => {
       return Object.assign({ userId: userChatId }, { chatId })
     })
     const userChats = await UserChat.bulkCreate(userchatsToBeCreated, { transaction: t })
     await t.commit()
     const newUserId = userChats.map(uid => uid.userId)
+
     let newUser = await User.findAll({
       where: {
         id: {
           $in: newUserId
         }
-      },
-      transaction: t
+      }
     })
     const userStr = JSON.stringify(newUser)
     const userParse = JSON.parse(userStr)
+
     for (let i in userParse) {
       userParse[i].screenName = userParse[i].firstName + ' ' + userParse[i].lastName
       newUser = userParse[i]
     }
 
     const result = {
-      chat,
-      userChats
+      chat: chat.toJSON(),
+      userChats: userChats,
+      User: newUser
     }
     ctx.status = 200
     ctx.body = result
@@ -77,7 +79,7 @@ exports.inviteUser = async ctx => {
   let newUserChats, newUser
   await global.db.transaction(async t => {
     const queryOptions = { transaction: t }
-    await UserChat.bulkCreate(userChatsToBeCreated, queryOptions)
+    await UserChat.bulkCreate({userChatsToBeCreated, ...queryOptions})
     newUserChats = await UserChat.findAll({ where: { chatId }, ...queryOptions })
     const newUserId = newUserChats.map(uid => uid.userId)
     newUser = await User.findAll({
@@ -92,14 +94,14 @@ exports.inviteUser = async ctx => {
   })
   const userStr = JSON.stringify(newUser)
   const userParse = JSON.parse(userStr)
+  let result
   for (let i in userParse) {
     userParse[i].screenName = userParse[i].firstName + ' ' + userParse[i].lastName
-    newUser = userParse[i]
-  }
-  const result = {
-    chat: chat.toJSON(),
-    userChats: newUserChats,
-    User: newUser
+    result = {
+      chat: chat.toJSON(),
+      UserChats: newUserChats,
+      User: newUser[i]
+    }
   }
   ctx.status = 200
   ctx.body = result

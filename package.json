@@ -7,6 +7,7 @@
     "start": "if-env NODE_ENV=production ?? npm run start:prod || npm run start:dev",
     "start:dev": "nodemon index.js",
     "start:prod": "node index.js",
+    "doc": "apidoc -f /*.doc.js -i app/doc/ -o public/doc/",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "engines": {
@@ -17,17 +18,9 @@
     "type": "git",
     "url": "https://gitlab.com/api-league/messenger-backend.git"
   },
-  "keywords": [
-    "node",
-    "koa",
-    "async-await"
-  ],
+  "keywords": [ "node", "koa", "async-await" ],
   "author": "Kristoff",
-  "contributors": [
-    "Bruce Hem <bruce.hem@pathmazing.com>",
-    "Shaw",
-    "Stan"
-  ],
+  "contributors": [ "Bruce Hem <bruce.hem@pathmazing.com>", "Shaw", "Stan" ],
   "license": "ISC",
   "dependencies": {
     "async-busboy": "^0.6.1",
@@ -59,6 +52,12 @@
   "devDependencies": {
     "@types/sequelize": "github:types/sequelize",
     "nodemon": "^1.11.0",
+    "apidoc": "^0.17.6",
     "standard": "^10.0.3"
+  },
+  "apidoc": {
+    "name": "Pathmazing enterprise messager",
+    "version": "1.0.0",
+    "description": "API Documentation for Pathmazing enterprise messager"
   }
 }

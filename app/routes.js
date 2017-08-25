@@ -90,6 +90,12 @@ module.exports = [
     ]
   },
   {
+    prefix: '/v1/Users',
+    routes: [
+      { method: 'GET', path: '/', middleware: [ validateEmail, validateLogin ], handler: UserController.listUser }
+    ]
+  },
+  {
     prefix: '/v1/profiles',
     routes: [
       { method: 'GET', path: '/', middleware: [ isAuthenticated ], handler: UserController.getUserProfile },
