@@ -176,7 +176,7 @@ exports.listChat = async ctx => {
     for (let j in chatTitle) {
       if (chatMessage[i].chatId === chatTitle[j].id) {
         chatMessage[i].title = chatTitle[j].title
-        chatMessage[i].profile = chatTitle[i].imageUrl
+        chatMessage[i].profile = chatTitle[j].imageUrl
       }
     }
   }
