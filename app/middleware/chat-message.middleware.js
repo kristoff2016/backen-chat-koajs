@@ -6,6 +6,7 @@ exports.validateChat = async (ctx, next) => {
   const { id } = ctx.params
   const chat = await Chat.find({ where: { id } })
   if (!chat) throw new BadRequestError('Chat not found!')
+  ctx.state.chat = chat
   await next()
 }
 
