@@ -79,29 +79,30 @@ exports.inviteUser = async ctx => {
   let newUserChats, newUser
   await global.db.transaction(async t => {
     const queryOptions = { transaction: t }
-    await UserChat.bulkCreate({userChatsToBeCreated, ...queryOptions})
+    await UserChat.bulkCreate({ userChatsToBeCreated, ...queryOptions })
     newUserChats = await UserChat.findAll({ where: { chatId }, ...queryOptions })
-    const newUserId = newUserChats.map(uid => uid.userId)
+    const userChatIds = newUserChats.map(uid => uid.userId)
     newUser = await User.findAll({
       where: {
         id: {
-          $in: newUserId
+          $in: userChatIds
         }
       },
       ...queryOptions
     })
-    // const user = await User.findAll({where:  })
   })
+
   const userStr = JSON.stringify(newUser)
   const userParse = JSON.parse(userStr)
-  let result
+
   for (let i in userParse) {
     userParse[i].screenName = userParse[i].firstName + ' ' + userParse[i].lastName
-    result = {
-      chat: chat.toJSON(),
-      UserChats: newUserChats,
-      User: newUser[i]
-    }
+    newUser = userParse[i]
+  }
+  const result = {
+    chat: chat.toJSON(),
+    UserChats: newUserChats,
+    User: newUser
   }
   ctx.status = 200
   ctx.body = result
@@ -123,6 +124,7 @@ exports.kickUser = async ctx => {
   const userChatsToBeKick = kickedUserIds.map(u => u)
 
   let newUserChats, newUser
+
   await global.db.transaction(async t => {
     const queryOptions = { transaction: t }
     await UserChat.destroy({
@@ -135,25 +137,27 @@ exports.kickUser = async ctx => {
       ...queryOptions
     })
     newUserChats = await UserChat.findAll({ where: { chatId }, ...queryOptions })
-    const newUserId = newUserChats.map(uid => uid.userId)
+    const userChatIds = newUserChats.map(uid => uid.userId)
     newUser = await User.findAll({
       where: {
         id: {
-          $in: newUserId
+          $in: userChatIds
         }
       },
       ...queryOptions
     })
   })
+
   const userStr = JSON.stringify(newUser)
   const userParse = JSON.parse(userStr)
+
   for (let i in userParse) {
     userParse[i].screenName = userParse[i].firstName + ' ' + userParse[i].lastName
     newUser = userParse[i]
   }
   const result = {
     chat: chat.toJSON(),
-    userChats: newUserChats,
+    UserChats: newUserChats,
     User: newUser
   }
 
@@ -164,25 +168,43 @@ exports.kickUser = async ctx => {
 }
 
 exports.listChat = async ctx => {
-  const { id: userId } = ctx.state.currentUser
-  let userChats = await UserChat.findAll({ where: { userId }, include: [ User, Chat ] })
-  let chatIdList = userChats.map(userChat => userChat.chatId)
+  /**
+   * @param id { user id }
+   */
 
+  const { id } = ctx.state.currentUser
+  const userChat = await UserChat.findAll({ where: { userId: id } })
+  let chatIdList = userChat.map(userChat => userChat.chatId)
+  let chatTitle = await Chat.findAll({ where: { id: { $in: chatIdList } } })
+  const chatTitleStr = JSON.stringify(chatTitle)
+  let chatTitleParse = JSON.parse(chatTitleStr)
   const chatMessage = await ChatMessage.findAll({
-    where: { chatId: chatIdList },
-    limit: 1,
-    order: [ [ 'createdAt', 'DESC' ] ]
+    where: { chatId: { $in: chatIdList } },
+    group: [ [ 'chatId', 'DESC' ] ]
   })
-
-  const chatList = userChats.map(userChat => {
-    const { firstName, lastName, imageUrl } = userChat.user
-    const { id, title } = userChat.chat
-    let content = ''
-    if (chatMessage.length !== 0) {
-      content = chatMessage[0].content
+  const chatMessageStr = JSON.stringify(chatMessage)
+  let chatMessageParse = JSON.parse(chatMessageStr)
+  for (let i in chatMessageParse) {
+    for (let j in chatTitleParse) {
+      if (chatMessageParse[i].chatId === chatTitleParse[j].id) {
+        chatMessageParse[i].title = chatTitleParse[j].title
+        chatMessageParse[i].profile = chatTitleParse[i].imageUrl
+      }
     }
-    return { id, title, firstName, lastName, imageUrl, content }
+  }
+  const userIds = chatMessageParse.map(chatMessageParse => chatMessageParse.userId)
+  const userData = await User.findAll({
+    where: { id: { $in: userIds } }
   })
-
-  ctx.body = { message: 'success', status: 200, data: chatList }
+  const userDataeStr = JSON.stringify(userData)
+  const userDataParse = JSON.parse(userDataeStr)
+  for (let i in userDataParse) {
+    userDataParse[i].screenName = userDataParse[i].firstName + ' ' + userDataParse[i].lastName
+    for (let j in userIds) {
+      if (userDataParse[i].id === userIds[j]) {
+        chatMessageParse[j].user = userDataParse[i]
+      }
+    }
+  }
+  ctx.body = { message: 'success', status: 200, data: chatMessageParse }
 }
