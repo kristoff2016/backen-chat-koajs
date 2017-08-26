@@ -16,13 +16,11 @@ const emitChatUserEvent = async (ctx, eventName, payload) => {
 exports.createChat = async ctx => {
   const { currentUser } = ctx.state
   const { userIds, title, imageUrl } = ctx.request.body
-  console.log('userIds===', userIds)
   const t = await global.db.transaction()
 
   try {
     const chat = await Chat.create({ title, imageUrl, createdBy: currentUser.id }, { transaction: t })
     const chatId = chat.id
-    console.log('chatId==', chatId)
     const userId = currentUser.id
     userIds.push(userId)
     const userchatsToBeCreated = userIds.map(userChatId => {
@@ -38,7 +36,8 @@ exports.createChat = async ctx => {
         }
       },
       raw: true
-    })   
+    })
+
     for (let i in newUser) {
       newUser[i].screenName = newUser[i].firstName + ' ' + newUser[i].lastName
     }
@@ -52,7 +51,6 @@ exports.createChat = async ctx => {
     ctx.body = result
     await emitChatUserEvent(ctx, 'createChat', result)
   } catch (error) {
-    console.log('error=====', error)
     await t.rollback()
     throw error
   }
